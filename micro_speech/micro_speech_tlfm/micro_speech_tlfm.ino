@@ -1,4 +1,4 @@
-/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ limitations under the License.
 
 #include "main_functions.h"
 
-#include "model_settings.h"
-#include "person_detect_model_data.h"
+#include "micro_features_micro_model_settings.h"
+#include "micro_features_model.h"
 #include "tensorflow/lite/micro/micro_error_reporter.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
@@ -30,44 +30,52 @@ namespace {
 tflite::ErrorReporter* error_reporter = nullptr;
 const tflite::Model* model = nullptr;
 tflite::MicroInterpreter* interpreter = nullptr;
-TfLiteTensor* input = nullptr;
+TfLiteTensor* model_input = nullptr;
 
-// An area of memory to use for input, output, and intermediate arrays.
-constexpr int kTensorArenaSize = 136 * 1024;
-static uint8_t tensor_arena[kTensorArenaSize];
+// Create an area of memory to use for input, output, and intermediate arrays.
+// The size of this will depend on the model you're using, and may need to be
+// determined by experimentation.
+constexpr int kTensorArenaSize = 10 * 1024;
+uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
 
+// The name of this function is important for Arduino compatibility.
 void setup() {
-  Serial.begin(115200);
+  // Set up logging. Google style is to avoid globals or statics because of
+  // lifetime uncertainty, but since this has a trivial destructor it's okay.
+  // NOLINTNEXTLINE(runtime-global-variables)
   static tflite::MicroErrorReporter micro_error_reporter;
   error_reporter = &micro_error_reporter;
 
-  model = tflite::GetModel(g_person_detect_model_data);
+  model = tflite::GetModel(g_model);
 
-
-  static tflite::MicroMutableOpResolver<5> micro_op_resolver;
-  micro_op_resolver.AddAveragePool2D();
-  micro_op_resolver.AddConv2D();
+  static tflite::MicroMutableOpResolver<4> micro_op_resolver(error_reporter);
   micro_op_resolver.AddDepthwiseConv2D();
-  micro_op_resolver.AddReshape();
+  micro_op_resolver.AddFullyConnected();
   micro_op_resolver.AddSoftmax();
+  micro_op_resolver.AddReshape();
 
+  // Build an interpreter to run the model with.
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize, error_reporter);
   interpreter = &static_interpreter;
 
+  // Allocate memory from the tensor_arena for the model's tensors.
   TfLiteStatus allocate_status = interpreter->AllocateTensors();
-  input = interpreter->input(0);
-  
+  model_input = interpreter->input(0);
+
   for (int i = 0; i < 96 * 96; i++) {
-    input->data.int8[i] = 0;
+    model_input->data.int8[i] = 0;
   }
 }
 
+// The name of this function is important for Arduino compatibility.
 void loop() {
-  interpreter->Invoke();
+  // Run the model on the spectrogram input and make sure it succeeds.
+  TfLiteStatus invoke_status = interpreter->Invoke();
   TfLiteTensor* output = interpreter->output(0);
-  /*for (int i = 0; i < 3; i++) {
+  
+  /*for (int i = 0; i < 4; i++) {
     Serial.print(output->data.uint8[i]);
     Serial.print(",");
   }
