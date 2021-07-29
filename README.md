@@ -108,7 +108,11 @@ void loop() {
 
 | Implementation | Keyword spotting [Nano](https://store.arduino.cc/usa/nano-33-ble) (↑) | Person detection [Nano](https://store.arduino.cc/usa/nano-33-ble) (↑) | Person detection [SPRESENSE](https://developer.sony.com/develop/spresense/) (↑) |
 | - | - | - | - |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)     | 137,332 bytes |  bytes  |  bytes |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)       |  bytes |  bytes |  bytes |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro) | 196,580 bytes | bytes  | |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)     | 137,332 bytes | |  bytes |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)       |  bytes | |  bytes |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro) | 196,580 bytes | 69,604 bytes  | |
+
+# Runtime measurement
+
+On all Arduino boards, there is a natural and consistent way of measuring elapsed time - the `micros()` function. It is implemented differently on different boards, and its accuracy varies between implementations, but it is always accurate to < 1 ms. Most are much better than this - for example, the Spresense is accurate to +- 30 μs. If a higher precision runtime measurement was ever desired, an oscilloscope could be used to count CPU cycles, but this is probably overkill for now.
 
