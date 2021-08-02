@@ -8,24 +8,22 @@ The AOT runtime consumes much less RAM than the graph executor, and runs a littl
 ## Keyword spotting on the [Nano 33 BLE](https://store.arduino.cc/usa/nano-33-ble)
 | Implementation | Flash usage (bytes) | Unused RAM (bytes) | Initialization speed (ms) | Inference speed (ms) |
 | -------------- | ------------------- | ----------------- | ------------------------- | -------------------- |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 148,152 bytes | 137,332 bytes |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 125,544 bytes | 188,388 bytes |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 151,480 bytes | 196,580 bytes |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 148,152 bytes | 137,332 bytes | 101.976 ms |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 125,544 bytes | 188,388 bytes | 87.817 ms |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 151,480 bytes | 196,580 bytes | 53.654 ms |
 
 ## Person detection on the [Nano 33 BLE](https://store.arduino.cc/usa/nano-33-ble)
 | Implementation | Flash usage (bytes) | RAM free (bytes) | Initialization speed (ms) | Inference speed (ms) |
 | -------------- | ------------------- | ----------------- | ------------------------- | -------------------- |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 570,352 bytes | |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 530,624 bytes | |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 441,160 bytes | 69,604 bytes |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 570,352 bytes | | | |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 530,624 bytes | | | |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 441,160 bytes | 69,604 bytes | 653.005 ms |
 
 ## Person detection on the [Sony SPRESENSE](https://developer.sony.com/develop/spresense/)
 | Implementation | Flash usage (bytes) | Unused RAM (bytes) | Initialization speed (ms) | Inference speed (ms) |
 | -------------- | ------------------- | ----------------- | ------------------------- | -------------------- |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 641,912 bytes | 319,128 bytes |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 1,210,984 bytes | 296,344 bytes |
-
-
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 641,912 bytes | 319,128 bytes | 1223.217 ms |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 1,210,984 bytes | 296,344 bytes | 1423.898 ms |
 
 # Models
 
@@ -126,7 +124,6 @@ While the initialization and inference times were very consistent, it seemed pru
 <pre>
 #include "src/model.h"
 
-static Model model;
 void setup() {
   int8_t input_data[1920] = {0};
   int8_t output_data[4];
@@ -149,6 +146,8 @@ void setup() {
 void loop() {}
 </pre>
 
+The means of all the runs are shown in the table below. If you'd like to see the raw data, check the `inference_times.txt` and `initialization_times.txt` files in each sketch folder.
+
 ### Initialization speed results
 
 
@@ -162,6 +161,6 @@ void loop() {}
 
 | Implementation | Keyword spotting [Nano](https://store.arduino.cc/usa/nano-33-ble) (↑) | Person detection [Nano](https://store.arduino.cc/usa/nano-33-ble) (↑) | Person detection [SPRESENSE](https://developer.sony.com/develop/spresense/) (↑) |
 | - | - | - | - |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)     | ms | | ms |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)       | ms | | ms |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro) | 653.005 ms | ms | |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)     | 101.976 ms | | 1223.217 ms |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)       | 87.817 ms | | 1423.898 ms |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro) | 53.654 ms | 653.005 ms | |
