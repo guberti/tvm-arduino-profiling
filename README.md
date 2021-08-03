@@ -8,26 +8,28 @@ The AOT runtime consumes much less RAM than the graph executor, and runs a littl
 ## Keyword spotting on the [Nano 33 BLE](https://store.arduino.cc/usa/nano-33-ble)
 | Implementation | Flash usage (bytes) | Unused RAM (bytes) | Initialization speed (ms) | Inference speed (ms) |
 | -------------- | ------------------- | ----------------- | ------------------------- | -------------------- |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 148,152 bytes | 137,332 bytes | 101.976 ms |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 125,544 bytes | 188,388 bytes | 87.817 ms |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 151,480 bytes | 196,580 bytes | 53.654 ms |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 148,152 bytes | 137,332 bytes | 14.526 ms | 101.976 ms |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 125,544 bytes | 188,388 bytes | 0 ms | 87.817 ms |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 151,480 bytes | 196,580 bytes | 1.206 ms | 53.654 ms |
 
 ## Person detection on the [Nano 33 BLE](https://store.arduino.cc/usa/nano-33-ble)
 | Implementation | Flash usage (bytes) | RAM free (bytes) | Initialization speed (ms) | Inference speed (ms) |
 | -------------- | ------------------- | ----------------- | ------------------------- | -------------------- |
 | [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 570,352 bytes | | | |
 | [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 530,624 bytes | | | |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 441,160 bytes | 69,604 bytes | 653.005 ms |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro)    | 441,160 bytes | 69,604 bytes | 71.209 ms | 653.005 ms |
 
 ## Person detection on the [Sony SPRESENSE](https://developer.sony.com/develop/spresense/)
 | Implementation | Flash usage (bytes) | Unused RAM (bytes) | Initialization speed (ms) | Inference speed (ms) |
 | -------------- | ------------------- | ----------------- | ------------------------- | -------------------- |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 641,912 bytes | 319,128 bytes | 1223.217 ms |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 1,210,984 bytes | 296,344 bytes | 1423.898 ms |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)  | 641,912 bytes | 319,128 bytes | 66.272 ms | 1223.217 ms |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)    | 1,210,984 bytes | 296,344 bytes | 0 ms | 1423.898 ms |
 
 # Models
 
 We picked two models for profiling that have been very heavily tuned by the TLFM folks for performance on Arduino - the [micro speech](https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/examples/micro_speech) and [person detection](https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/examples/person_detection) models (these are the same ones on the [TVM Arduino demos repository](https://github.com/guberti/tvm-arduino-demos).
+
+As currently implemented in TVM (with both executors), the [person detection](https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/examples/person_detection) model is too large to run on the Arduino Nano, so these cells are blank. Also, Tensorflow Lite for Microcontrollers is platform-specific and does not work on the Sony Spresense, so these cells are blank too.
 
 # Flash usage
 
@@ -39,7 +41,7 @@ void setup() {}
 void loop() {}
 ```
 
-Additionally, for some of the implementation/model/board pairings, the Arduino IDE discovered there was not enough memory and refused to compile the sketch. To get data for these pairings anyway, I temporarily changed the start/end RAM pointers `linker_script.ld`. These entries are marked with a \*. 
+Additionally, for some of the implementation/model/board pairings, the Arduino IDE discovered there was not enough memory and refused to compile the sketch. I overrode this refusal to compile by modifying `linker_script.ld`. These entries are marked with a \*. 
 
 Since Tensorflow Lite Micro cannot run on the Sony SPRESENSE Arduino bindings, these cells are empty.
 
@@ -146,16 +148,15 @@ void setup() {
 void loop() {}
 </pre>
 
-The means of all the runs are shown in the table below. If you'd like to see the raw data, check the `inference_times.txt` and `initialization_times.txt` files in each sketch folder.
+The means of all the runs are shown in the table below. If you'd like to see the raw data, check the `inference_times.txt` and `initialization_times.txt` files in each sketch folder. Note also that initialization for the `aot_executor` is effectively instant, as all it does is set three pointers. 
 
 ### Initialization speed results
 
-
 | Implementation | Keyword spotting [Nano](https://store.arduino.cc/usa/nano-33-ble) (↓) | Person detection [Nano](https://store.arduino.cc/usa/nano-33-ble) (↓) | Person detection [SPRESENSE](https://developer.sony.com/develop/spresense/) (↓) |
 | - | - | - | - |
-| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)     | ms | | ms |
-| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)       | ms | | ms |
-| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro) | ms | ms | |
+| [TVM `graph_executor`](https://github.com/apache/tvm/pull/8493)     | 14.526 ms | | 66.272 ms |
+| [TVM `aot_executor`](https://github.com/apache/tvm/pull/8578)       | 0 ms | | 0 ms |
+| [Tensorflow Lite Micro](https://github.com/tensorflow/tflite-micro) | 1.206 ms | 71.209 ms | |
 
 ### Inference speed results
 
