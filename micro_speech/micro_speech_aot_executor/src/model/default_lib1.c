@@ -2168,102 +2168,6 @@ static const int16_t __tvm_param__p6[1] = {
 #ifdef __cplusplus
 extern "C"
 #endif
-TVM_DLL int32_t tvmgen_default_fused_nn_conv2d_add_cast_multiply_add_right_shift_cast_add_clip_cast_clip(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6) {
-  void* placeholder = arg0;
-  void* placeholder1 = arg1;
-  void* placeholder2 = arg2;
-  void* placeholder3 = arg3;
-  void* placeholder4 = arg4;
-  void* placeholder5 = arg5;
-  void* compute = arg6;
-  void* PaddedInput = TVMBackendAllocWorkspace(1, 0, (uint64_t)5336, 0, 16);
-  if (PaddedInput == NULL) {
-    return -1;
-  }
-  for (int32_t i0_i1_fused = 0; i0_i1_fused < 58; ++i0_i1_fused) {
-    for (int32_t i2 = 0; i2 < 46; ++i2) {
-      ((int16_t*)PaddedInput)[(((i0_i1_fused * 46) + i2))] = (((((4 <= i0_i1_fused) && (i0_i1_fused < 53)) && (3 <= i2)) && (i2 < 43)) ? ((int16_t*)placeholder)[((((i0_i1_fused * 40) + i2) - 163))] : (int16_t)0);
-    }
-  }
-  for (int32_t i0_i1_fused_i2_fused = 0; i0_i1_fused_i2_fused < 500; ++i0_i1_fused_i2_fused) {
-    void* Conv2dOutput = TVMBackendAllocWorkspace(1, 0, (uint64_t)4, 0, 32);
-    if (Conv2dOutput == NULL) {
-      return -1;
-    }
-    for (int32_t i3 = 0; i3 < 8; ++i3) {
-      ((int32_t*)Conv2dOutput)[(0)] = 0;
-      for (int32_t ry = 0; ry < 10; ++ry) {
-        for (int32_t rx = 0; rx < 8; ++rx) {
-          ((int32_t*)Conv2dOutput)[(0)] = (((int32_t*)Conv2dOutput)[(0)] + (((int32_t)((int16_t*)PaddedInput)[((((((i0_i1_fused_i2_fused / 20) * 92) + (ry * 46)) + ((i0_i1_fused_i2_fused % 20) * 2)) + rx))]) * ((int32_t)((int16_t*)placeholder1)[((((ry * 64) + (rx * 8)) + i3))])));
-        }
-      }
-      int32_t _1 = ((int32_t)((((((int64_t)((int32_t*)Conv2dOutput)[(0)]) + ((int64_t)((int32_t*)placeholder2)[(i3)])) * ((int64_t*)placeholder3)[(i3)]) + ((int64_t*)placeholder4)[(i3)]) >> ((int64_t*)placeholder5)[(i3)])) - 128;
-      int32_t _2 = (_1) < (127) ? (_1) : (127);
-      int8_t _3 = (int8_t)((_2) > (-128) ? (_2) : (-128));
-      int8_t _4 = (int8_t)127;
-      int8_t _5 = (_3) < (_4) ? (_3) : (_4);
-      int8_t _6 = (int8_t)-128;
-      ((int8_t*)compute)[(((i0_i1_fused_i2_fused * 8) + i3))] = ((_5) > (_6) ? (_5) : (_6));
-    }
-    if (TVMBackendFreeWorkspace(1, 0, Conv2dOutput) != 0) {
-      return -1;
-    }
-  }
-  if (TVMBackendFreeWorkspace(1, 0, PaddedInput) != 0) {
-    return -1;
-  }
-  return 0;
-}
-
-#ifdef __cplusplus
-extern "C"
-#endif
-TVM_DLL int32_t tvmgen_default_fused_nn_softmax(void* arg0, void* arg1) {
-  void* placeholder = arg0;
-  void* T_softmax_norm = arg1;
-  void* T_softmax_maxelem = TVMBackendAllocWorkspace(1, 0, (uint64_t)4, 2, 32);
-  if (T_softmax_maxelem == NULL) {
-    return -1;
-  }
-  void* T_softmax_exp = TVMBackendAllocWorkspace(1, 0, (uint64_t)16, 2, 32);
-  if (T_softmax_exp == NULL) {
-    return -1;
-  }
-  void* T_softmax_expsum = TVMBackendAllocWorkspace(1, 0, (uint64_t)4, 2, 32);
-  if (T_softmax_expsum == NULL) {
-    return -1;
-  }
-  ((float*)T_softmax_maxelem)[(0)] = -3.402823e+38f;
-  for (int32_t k = 0; k < 4; ++k) {
-    float _1 = ((float*)T_softmax_maxelem)[(0)];
-    float _2 = ((float*)placeholder)[(k)];
-    ((float*)T_softmax_maxelem)[(0)] = ((_1) > (_2) ? (_1) : (_2));
-  }
-  for (int32_t i1 = 0; i1 < 4; ++i1) {
-    ((float*)T_softmax_exp)[(i1)] = expf((((float*)placeholder)[(i1)] - ((float*)T_softmax_maxelem)[(0)]));
-  }
-  ((float*)T_softmax_expsum)[(0)] = 0.000000e+00f;
-  for (int32_t k1 = 0; k1 < 4; ++k1) {
-    ((float*)T_softmax_expsum)[(0)] = (((float*)T_softmax_expsum)[(0)] + ((float*)T_softmax_exp)[(k1)]);
-  }
-  for (int32_t i11 = 0; i11 < 4; ++i11) {
-    ((float*)T_softmax_norm)[(i11)] = (((float*)T_softmax_exp)[(i11)] / ((float*)T_softmax_expsum)[(0)]);
-  }
-  if (TVMBackendFreeWorkspace(1, 0, T_softmax_expsum) != 0) {
-    return -1;
-  }
-  if (TVMBackendFreeWorkspace(1, 0, T_softmax_exp) != 0) {
-    return -1;
-  }
-  if (TVMBackendFreeWorkspace(1, 0, T_softmax_maxelem) != 0) {
-    return -1;
-  }
-  return 0;
-}
-
-#ifdef __cplusplus
-extern "C"
-#endif
 TVM_DLL int32_t tvmgen_default_fused_reshape_cast_subtract(void* arg0, void* arg1, void* arg2) {
   void* placeholder = arg0;
   void* placeholder1 = arg1;
@@ -2331,6 +2235,102 @@ TVM_DLL int32_t tvmgen_default_fused_nn_contrib_dense_pack_add_fixed_point_multi
     ((float*)T_multiply)[(ax1_inner_inner)] = (((float)(((int32_t)((int8_t)((_2) > (-128) ? (_2) : (-128)))) - 29)) * 1.055452e-01f);
   }
   if (TVMBackendFreeWorkspace(1, 0, compute_global) != 0) {
+    return -1;
+  }
+  return 0;
+}
+
+#ifdef __cplusplus
+extern "C"
+#endif
+TVM_DLL int32_t tvmgen_default_fused_nn_softmax(void* arg0, void* arg1) {
+  void* placeholder = arg0;
+  void* T_softmax_norm = arg1;
+  void* T_softmax_maxelem = TVMBackendAllocWorkspace(1, 0, (uint64_t)4, 2, 32);
+  if (T_softmax_maxelem == NULL) {
+    return -1;
+  }
+  void* T_softmax_exp = TVMBackendAllocWorkspace(1, 0, (uint64_t)16, 2, 32);
+  if (T_softmax_exp == NULL) {
+    return -1;
+  }
+  void* T_softmax_expsum = TVMBackendAllocWorkspace(1, 0, (uint64_t)4, 2, 32);
+  if (T_softmax_expsum == NULL) {
+    return -1;
+  }
+  ((float*)T_softmax_maxelem)[(0)] = -3.402823e+38f;
+  for (int32_t k = 0; k < 4; ++k) {
+    float _1 = ((float*)T_softmax_maxelem)[(0)];
+    float _2 = ((float*)placeholder)[(k)];
+    ((float*)T_softmax_maxelem)[(0)] = ((_1) > (_2) ? (_1) : (_2));
+  }
+  for (int32_t i1 = 0; i1 < 4; ++i1) {
+    ((float*)T_softmax_exp)[(i1)] = expf((((float*)placeholder)[(i1)] - ((float*)T_softmax_maxelem)[(0)]));
+  }
+  ((float*)T_softmax_expsum)[(0)] = 0.000000e+00f;
+  for (int32_t k1 = 0; k1 < 4; ++k1) {
+    ((float*)T_softmax_expsum)[(0)] = (((float*)T_softmax_expsum)[(0)] + ((float*)T_softmax_exp)[(k1)]);
+  }
+  for (int32_t i11 = 0; i11 < 4; ++i11) {
+    ((float*)T_softmax_norm)[(i11)] = (((float*)T_softmax_exp)[(i11)] / ((float*)T_softmax_expsum)[(0)]);
+  }
+  if (TVMBackendFreeWorkspace(1, 0, T_softmax_expsum) != 0) {
+    return -1;
+  }
+  if (TVMBackendFreeWorkspace(1, 0, T_softmax_exp) != 0) {
+    return -1;
+  }
+  if (TVMBackendFreeWorkspace(1, 0, T_softmax_maxelem) != 0) {
+    return -1;
+  }
+  return 0;
+}
+
+#ifdef __cplusplus
+extern "C"
+#endif
+TVM_DLL int32_t tvmgen_default_fused_nn_conv2d_add_cast_multiply_add_right_shift_cast_add_clip_cast_clip(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6) {
+  void* placeholder = arg0;
+  void* placeholder1 = arg1;
+  void* placeholder2 = arg2;
+  void* placeholder3 = arg3;
+  void* placeholder4 = arg4;
+  void* placeholder5 = arg5;
+  void* compute = arg6;
+  void* PaddedInput = TVMBackendAllocWorkspace(1, 0, (uint64_t)5336, 0, 16);
+  if (PaddedInput == NULL) {
+    return -1;
+  }
+  for (int32_t i0_i1_fused = 0; i0_i1_fused < 58; ++i0_i1_fused) {
+    for (int32_t i2 = 0; i2 < 46; ++i2) {
+      ((int16_t*)PaddedInput)[(((i0_i1_fused * 46) + i2))] = (((((4 <= i0_i1_fused) && (i0_i1_fused < 53)) && (3 <= i2)) && (i2 < 43)) ? ((int16_t*)placeholder)[((((i0_i1_fused * 40) + i2) - 163))] : (int16_t)0);
+    }
+  }
+  for (int32_t i0_i1_fused_i2_fused = 0; i0_i1_fused_i2_fused < 500; ++i0_i1_fused_i2_fused) {
+    void* Conv2dOutput = TVMBackendAllocWorkspace(1, 0, (uint64_t)4, 0, 32);
+    if (Conv2dOutput == NULL) {
+      return -1;
+    }
+    for (int32_t i3 = 0; i3 < 8; ++i3) {
+      ((int32_t*)Conv2dOutput)[(0)] = 0;
+      for (int32_t ry = 0; ry < 10; ++ry) {
+        for (int32_t rx = 0; rx < 8; ++rx) {
+          ((int32_t*)Conv2dOutput)[(0)] = (((int32_t*)Conv2dOutput)[(0)] + (((int32_t)((int16_t*)PaddedInput)[((((((i0_i1_fused_i2_fused / 20) * 92) + (ry * 46)) + ((i0_i1_fused_i2_fused % 20) * 2)) + rx))]) * ((int32_t)((int16_t*)placeholder1)[((((ry * 64) + (rx * 8)) + i3))])));
+        }
+      }
+      int32_t _1 = ((int32_t)((((((int64_t)((int32_t*)Conv2dOutput)[(0)]) + ((int64_t)((int32_t*)placeholder2)[(i3)])) * ((int64_t*)placeholder3)[(i3)]) + ((int64_t*)placeholder4)[(i3)]) >> ((int64_t*)placeholder5)[(i3)])) - 128;
+      int32_t _2 = (_1) < (127) ? (_1) : (127);
+      int8_t _3 = (int8_t)((_2) > (-128) ? (_2) : (-128));
+      int8_t _4 = (int8_t)127;
+      int8_t _5 = (_3) < (_4) ? (_3) : (_4);
+      int8_t _6 = (int8_t)-128;
+      ((int8_t*)compute)[(((i0_i1_fused_i2_fused * 8) + i3))] = ((_5) > (_6) ? (_5) : (_6));
+    }
+    if (TVMBackendFreeWorkspace(1, 0, Conv2dOutput) != 0) {
+      return -1;
+    }
+  }
+  if (TVMBackendFreeWorkspace(1, 0, PaddedInput) != 0) {
     return -1;
   }
   return 0;

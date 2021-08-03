@@ -53,9 +53,9 @@ void Model::inference(void *input_data, void *output_data) {
 
   // Prepare our output tensor
   DLTensor output_data_tensor = {
-    output_data, 
-    HARDWARE_DEVICE, 
-    OUTPUT_DATA_DIMENSION, 
+    output_data,
+    HARDWARE_DEVICE,
+    OUTPUT_DATA_DIMENSION,
     OUTPUT_DATA_TYPE,
     OUTPUT_DATA_SHAPE,
     NULL,
@@ -64,20 +64,4 @@ void Model::inference(void *input_data, void *output_data) {
 
   // Populate output tensor
   TVMGraphExecutor_GetOutput(graph_runtime, 0, &output_data_tensor);
-}
-
-int Model::infer_category(void *input_data) {
-  int8_t output_data[10] = {0};
-  Model::inference(input_data, output_data);
-  int best = -1;
-  int maximum = -1000;
-  //Serial.println("Output tensor:");
-  for (int i = 0; i < 10; i++) {
-    //Serial.println(output_data[i]);
-    if (output_data[i] > maximum) {
-      maximum = output_data[i];
-      best = i;
-    }
-  }
-  return best;
 }

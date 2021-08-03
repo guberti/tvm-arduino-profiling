@@ -2,7 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
+ * regarding copyright ownerFship.  The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
@@ -100,10 +100,8 @@ void TVMGraphExecutorNode_LoadAttrs(TVMGraphExecutorNode* node, JSONReader* read
     } else if (!strcmp(key, "flatten_data")) {
       param->flatten_data = strtoul(value, 0, 10);
       bitmask |= 8;
-#if TVM_CRT_DEBUG
     } else {
-      printf("do not support key %s", key);
-#endif  // TVM_CRT_DEBUG
+      //fprintf(stderr, "do not support key %s", key);
     }
   }
   if (bitmask != (1 | 2 | 4 | 8)) {
